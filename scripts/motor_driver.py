@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-
 import rospy
 from std_msgs.msg import Float32
-
 import RPi.GPIO as GPIO
+
 # Set GPIO Mode
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -24,9 +23,6 @@ rmotor_pwr_abs = 0
 
 lmotor_pwr = 0
 lmotor_pwr_abs = 0
-
-timeout = 4
-
 
 # Setup H Bridge Pins as Output
 GPIO.setup(ENA, GPIO.OUT, initial=GPIO.LOW)

@@ -17,9 +17,9 @@ e_wr_prev = 0 #Derivative term
 e_wr_sum = 0 #Intergal Term
 action_r = 0 #Control action on right motor
 # PID Gains for right motor
-Kp_r = 0.45
-Ki_r = 0.15
-Kd_r = 0
+Kp_r = 4.5
+Ki_r = 0.4
+Kd_r = 0.01
 
 # Global Variables for PID of left motor
 wl_actual = 0
@@ -29,15 +29,15 @@ e_wl_prev = 0
 e_wl_sum = 0
 action_l = 0
 # PID Gains for left motor
-Kp_l = 0.45
-Ki_l = 0.08
-Kd_l = 0
+Kp_l = 4.5
+Ki_l = 0.35
+Kd_l = 0.01
 
 #Defining the node and publishers
 rospy.init_node('vel_pid_rob1')
 r_pwr = rospy.Publisher('rmotor_pwr_rob1', Float32, queue_size = 10)
 l_pwr = rospy.Publisher('lmotor_pwr_rob1', Float32, queue_size = 10)
-rate = rospy.Rate(30)
+rate = rospy.Rate(20)
 
 # The function resets all PID variables for a clean start
 def resetPID():
@@ -86,8 +86,8 @@ def PID():
         e_wl_sum += e_wl
 
         # Saturating Integral Term to Prevent Integral Windup
-        e_wr_sum = max(min(70, e_wr_sum), -70)
-        e_wl_sum = max(min(70, e_wl_sum), -70)
+        e_wr_sum = max(min(150, e_wr_sum), -150)
+        e_wl_sum = max(min(150, e_wl_sum), -150)
 
         r_pwr.publish(action_r)
         l_pwr.publish(action_l)
