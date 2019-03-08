@@ -3,15 +3,29 @@ from __future__ import division
 import rospy
 from std_msgs.msg import Int32
 from std_msgs.msg import Float32
+import math
+import time
 import RPi.GPIO as GPIO
 
 #################################################################
 #
 #    The Encoders Node
 #    Currently its main function is to interface with encoders
-#    and send encoders ticks on topics
+#    and send wheel distances and speeds in an interval dt
 #
 #################################################################
+
+#################################################################
+#
+#   Kinematics info
+#   Wheel Base = 18.5 cm
+#   Wheel Radius = 3.25 cm
+#   PPR ( Motor Side ) = 11 PPR
+#   Gear Ratio = 21.3 : 1
+#
+##################################################################
+
+import RPi.GPIO as GPIO
 
 # Set the GPIO modes
 GPIO.setmode(GPIO.BCM)
@@ -22,28 +36,90 @@ GPIO.setwarnings(False)
 encA1 = 23
 encB1 = 22
 encoder1_ticks = 0
+encoder1_ticks_calc = 0
+encoder1_ticks_prev = 0
+r_ticks = 0
 
 #Left Motor
 encA2 = 27
 encB2 = 24
 encoder2_ticks = 0
+encoder2_ticks_calc = 0
+encoder2_ticks_prev = 0
+l_ticks = 0
+
+# Distance Variables
+rwheel_dist = 0
+lwheel_dist = 0
+
+# Speed Variables
+rwheel_spd = 0
+lwheel_spd = 0
+
+# Delta Time for Calculations
+dt = 0.05
+
+# dist_const is used to facilitate dist/speed calculations respectively = (distance per rev) / (PPR * GR)
+dist_const = ( math.pi * 6.5 ) / ( 11 * 21.3 ) # Used to get distance covered in CM
 
 def encoders_talker():
+    global encoder1_ticks, encoder2_ticks
+    global rwheel_dist, lwheel_dist
+    global rwheel_spd, lwheel_spd
+    global encoder1_ticks_prev, encoder2_ticks_prev
+    global r_ticks, l_ticks
+
     # Initialize the node
     rospy.init_node('encoders_rob1')
     rospy.loginfo("%s started" % rospy.get_name())
 
     # Initialize encoder publishers
-    rate = rospy.Rate(20)
-    enc1= rospy.Publisher('enc1_ticks_rob1',Int32, queue_size=20)
-    enc2= rospy.Publisher('enc2_ticks_rob1',Int32, queue_size=20)
+    #enc1= rospy.Publisher('enc1_ticks_rob1',Int32, queue_size=10)
+    #enc2= rospy.Publisher('enc2_ticks_rob1',Int32, queue_size=10)
+
+    #Speed/Position Publishers
+    rwheelSpeed = rospy.Publisher('rwheel_spd_rob1', Float32, queue_size=5)
+    lwheelSpeed = rospy.Publisher('lwheel_spd_rob1', Float32, queue_size=5)
+
+    rwheelDist = rospy.Publisher('rwheel_dist_rob1', Float32, queue_size=5)
+    lwheelDist = rospy.Publisher('lwheel_dist_rob1', Float32, queue_size=5)
 
     while not rospy.is_shutdown():
+        # Saving current ticks because this should be a non-reenterant function
+        encoder1_ticks_calc = encoder1_ticks
+        encoder2_ticks_calc = encoder2_ticks
+
+        #Ticks recorded in dt
+        r_ticks = encoder1_ticks_calc - encoder1_ticks_prev
+        l_ticks = encoder2_ticks_calc - encoder2_ticks_prev
+
+        #Saving current ticks as previous ticks
+        encoder1_ticks_prev = encoder1_ticks_calc
+        encoder2_ticks_prev = encoder2_ticks_calc
+
+        #Distance covered in dt
+        rwheel_dist =  ( r_ticks * dist_const )
+        lwheel_dist =  ( l_ticks * dist_const )
+
+        #Speed in cm/s
+        rwheel_spd = rwheel_dist / dt
+        lwheel_spd = lwheel_dist / dt
+
         # Publishing Calculated Variables in dt
         # Encoder ticks since the beginning
-        enc1.publish(encoder1_ticks)
-        enc2.publish(encoder2_ticks)
-        rate.sleep()
+        #enc1.publish(encoder1_ticks)
+        #enc2.publish(encoder2_ticks)
+
+        # Wheel Velocities
+        rwheelSpeed.publish(rwheel_spd)
+        lwheelSpeed.publish(lwheel_spd)
+
+        # Distances covered by wheels since the beginning
+        rwheelDist.publish(rwheel_dist)
+        lwheelDist.publish(lwheel_dist)
+
+        # Wait dt
+        time.sleep(dt)
 
 # Updating encoder counters for each interrupt
 def do_encoder1(channel1):  #encoder1
