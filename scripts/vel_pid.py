@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from __future__ import division
 import rospy
 from std_msgs.msg import Float32
@@ -17,9 +16,9 @@ e_wr_prev = 0 #Derivative term
 e_wr_sum = 0 #Intergal Term
 action_r = 0 #Control action on right motor
 # PID Gains for right motor
-Kp_r = 0.45
+Kp_r = 0.42
 Ki_r = 0.15
-Kd_r = 0
+Kd_r = 0.001
 
 # Global Variables for PID of left motor
 wl_actual = 0
@@ -30,14 +29,14 @@ e_wl_sum = 0
 action_l = 0
 # PID Gains for left motor
 Kp_l = 0.45
-Ki_l = 0.08
-Kd_l = 0
+Ki_l = 0.14
+Kd_l = 0.001
 
 #Defining the node and publishers
 rospy.init_node('vel_pid_rob1')
-r_pwr = rospy.Publisher('rmotor_pwr_rob1', Float32, queue_size = 10)
-l_pwr = rospy.Publisher('lmotor_pwr_rob1', Float32, queue_size = 10)
-rate = rospy.Rate(30)
+r_pwr = rospy.Publisher('rmotor_pwr_rob1', Float32, queue_size = 5)
+l_pwr = rospy.Publisher('lmotor_pwr_rob1', Float32, queue_size = 5)
+r = rospy.Rate(25)
 
 # The function resets all PID variables for a clean start
 def resetPID():
@@ -48,13 +47,11 @@ def resetPID():
         e_wr_prev = 0
         e_wr_sum = 0
         action_r = 0
+
         e_wl = 0
         e_wl_prev = 0
         e_wl_sum = 0
         action_l = 0
-
-        wr_target = 0
-        wl_target = 0
 
         r_pwr.publish(action_r)
         l_pwr.publish(action_l)
@@ -64,7 +61,7 @@ def PID():
     global wr_actual, wr_target, e_wr, e_wr_prev, e_wr_sum
     global wl_actual, wl_target, e_wl, e_wl_prev, e_wl_sum
 
-    if ( goal_flag == 0 ):
+    if ( wr_target !=0 or wl_target!=0 ):
         # Calculate error
         e_wr = wr_target - wr_actual
         e_wl = wl_target - wl_actual
@@ -86,15 +83,13 @@ def PID():
         e_wl_sum += e_wl
 
         # Saturating Integral Term to Prevent Integral Windup
-        e_wr_sum = max(min(70, e_wr_sum), -70)
-        e_wl_sum = max(min(70, e_wl_sum), -70)
+        e_wr_sum = max(min(150, e_wr_sum), -150)
+        e_wl_sum = max(min(150, e_wl_sum), -150)
 
         r_pwr.publish(action_r)
         l_pwr.publish(action_l)
-
-        rate.sleep()
-
-    elif( goal_flag == 1 ):
+        r.sleep()
+    elif( wr_target == 0 and wl_target == 0):
         resetPID()
 
 
@@ -120,12 +115,12 @@ def goal_callback(data):
 
 def pid_listener():
     rospy.loginfo("%s started" % rospy.get_name())
+    rospy.Subscriber('rwheel_spd_rob1', Float32, wr_act_callback)
+    rospy.Subscriber('lwheel_spd_rob1', Float32, wl_act_callback)
+    rospy.Subscriber('rwheel_vtarget_rob1', Float32, wr_targ_callback)
+    rospy.Subscriber('lwheel_vtarget_rob1', Float32, wl_targ_callback)
+    rospy.Subscriber('gflag_rob1', Byte, goal_callback)
     while not rospy.is_shutdown():
-        rospy.Subscriber('rwheel_spd_rob1', Float32, wr_act_callback)
-        rospy.Subscriber('lwheel_spd_rob1', Float32, wl_act_callback)
-        rospy.Subscriber('rwheel_vtarget_rob1', Float32, wr_targ_callback)
-        rospy.Subscriber('lwheel_vtarget_rob1', Float32, wl_targ_callback)
-        rospy.Subscriber('gflag_rob1', Byte, goal_callback)
         PID()
 
 if __name__ == '__main__':
