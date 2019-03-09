@@ -31,11 +31,21 @@ pose_rob1
 ```
 
 ## Velocity PID
-The velocity pid script is a simple pid loop. When running, the output is published to the motor power topics, to which the motor driver is suscribed to
+The velocity pid script is a simple pid loop. When running, the output is published to the motor power topics, to which the motor driver is suscribed to. These are:
+```
+rmotor_pwr_rob1
+lmotor_pwr_rob1
+```
+
+The script subscribes to the wheel velocities topics to run the pid algorithm:
+```
+rwheel_spd_rob1
+lwheel_spd_rob1
+```
 
 ## Twist To Motors
+It then transforms the twist message into required wheel velocities by using the base width as **w** in the beginning of the script
 The script subscribes to a twist message on the following topic
 ```
 cmd_vel
 ```
-It then transforms the twist message into required wheel velocities by using the base width as w in the beginning of the script
