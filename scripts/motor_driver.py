@@ -3,6 +3,11 @@ import rospy
 from std_msgs.msg import Float32
 import RPi.GPIO as GPIO
 
+"""
+    *** Motor Driver Node ***
+    This node is just for interfacing DC motors with RPi3
+"""
+
 # Set GPIO Mode
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)

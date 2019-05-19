@@ -4,9 +4,16 @@ import roslib
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
 
-w = 18.5 #Wheel Base Length (cm)
+"""
+    *** Twist to Motors Nodes ***
+    The node takes twist messages for the robot navigation
+    and converts them to wheel velocities
+"""
 
-#Twist message Variables
+# Wheel Base Length (cm)
+w = 18.5 
+
+# Twist message Variables
 dx = 0
 dy = 0
 dr = 0
@@ -14,7 +21,7 @@ dr = 0
 r_target = 0
 l_target = 0
 
-#The function that converts the twist message into wheel velocities
+# The function that converts the twist message into wheel velocities
 def twistToVel():
     global r_target, l_target
 
@@ -23,7 +30,7 @@ def twistToVel():
     r_target = 1.0 * dx + dr * w / 2
     l_target = 1.0 * dx - dr * w / 2
 
-#Call back function to store the message
+# Call back function to store the message
 def twistCallback(data):
     global dx, dy, dr
     dx = data.linear.x
@@ -35,7 +42,7 @@ def twister():
     rospy.init_node('twister_rob1')
     rospy.loginfo("%s started" % rospy.get_name())
 
-    #Subscriber to the Twist Message
+    # Subscriber to the Twist Message
     rospy.Subscriber('cmd_vel', Twist, twistCallback)
 
     pub_rmotor = rospy.Publisher('rwheel_vtarget_rob1', Float32, queue_size=20)

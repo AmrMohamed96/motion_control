@@ -7,32 +7,24 @@ import math
 import time
 import RPi.GPIO as GPIO
 
-#################################################################
-#
-#    The Encoders Node
-#    Currently its main function is to interface with encoders
-#    and send wheel distances and speeds in an interval dt
-#
-#################################################################
+"""
+     *** The Encoders Node ***
+     Interfaces the magnetic encoders with the RPi3 B/B+
+     Calculates Encoder Ticks / Wheel Speeds / Wheel Distances
 
-#################################################################
-#
-#   Kinematics info
-#   Wheel Base = 18.5 cm
-#   Wheel Radius = 3.25 cm
-#   PPR ( Motor Side ) = 11 PPR
-#   Gear Ratio = 21.3 : 1
-#
-##################################################################
-
-import RPi.GPIO as GPIO
+     *** Kinematics info ***
+     Wheel Base = 18.5 cm
+     Wheel Radius = 3.25 cm
+     PPR ( Motor Side ) = 11 PPR
+     Gear Ratio = 21.3 : 1
+"""
 
 # Set the GPIO modes
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-#Encoder pins and counters
-#Right Motor
+""" Encoders Pins and Counter Variables """
+# Right Motor
 encA1 = 23
 encB1 = 22
 encoder1_ticks = 0
@@ -40,7 +32,7 @@ encoder1_ticks_calc = 0
 encoder1_ticks_prev = 0
 r_ticks = 0
 
-#Left Motor
+# Left Motor
 encA2 = 27
 encB2 = 24
 encoder2_ticks = 0
@@ -74,8 +66,8 @@ def encoders_talker():
     rospy.loginfo("%s started" % rospy.get_name())
 
     # Initialize encoder publishers
-    #enc1= rospy.Publisher('enc1_ticks_rob1',Int32, queue_size=10)
-    #enc2= rospy.Publisher('enc2_ticks_rob1',Int32, queue_size=10)
+    enc1= rospy.Publisher('enc1_ticks_rob1',Int32, queue_size=10)
+    enc2= rospy.Publisher('enc2_ticks_rob1',Int32, queue_size=10)
 
     #Speed/Position Publishers
     rwheelSpeed = rospy.Publisher('rwheel_spd_rob1', Float32, queue_size=5)
@@ -89,26 +81,26 @@ def encoders_talker():
         encoder1_ticks_calc = encoder1_ticks
         encoder2_ticks_calc = encoder2_ticks
 
-        #Ticks recorded in dt
+        # Ticks recorded in dt
         r_ticks = encoder1_ticks_calc - encoder1_ticks_prev
         l_ticks = encoder2_ticks_calc - encoder2_ticks_prev
 
-        #Saving current ticks as previous ticks
+        # Saving current ticks as previous ticks
         encoder1_ticks_prev = encoder1_ticks_calc
         encoder2_ticks_prev = encoder2_ticks_calc
 
-        #Distance covered in dt
+        # Distance covered in dt
         rwheel_dist =  ( r_ticks * dist_const )
         lwheel_dist =  ( l_ticks * dist_const )
 
-        #Speed in cm/s
+        # Speed in cm/s
         rwheel_spd = rwheel_dist / dt
         lwheel_spd = lwheel_dist / dt
 
         # Publishing Calculated Variables in dt
         # Encoder ticks since the beginning
-        #enc1.publish(encoder1_ticks)
-        #enc2.publish(encoder2_ticks)
+        enc1.publish(encoder1_ticks)
+        enc2.publish(encoder2_ticks)
 
         # Wheel Velocities
         rwheelSpeed.publish(rwheel_spd)
@@ -122,14 +114,16 @@ def encoders_talker():
         time.sleep(dt)
 
 # Updating encoder counters for each interrupt
-def do_encoder1(channel1):  #encoder1
+# Encoder 1
+def do_encoder1(channel1):  
 	global encoder1_ticks
 	if GPIO.input(encB1) == 1:
 		encoder1_ticks -= 1
 	else:
 		encoder1_ticks += 1
 
-def do_encoder2(channel2):  #encoder2
+# Encoder 2
+def do_encoder2(channel2): 
 	global encoder2_ticks
 	if GPIO.input(encB2) == 1:
 		encoder2_ticks += 1
@@ -137,14 +131,14 @@ def do_encoder2(channel2):  #encoder2
 		encoder2_ticks -= 1
 
 # Encoder 1 GPIO
-GPIO.setup (encA1, GPIO.IN, pull_up_down=GPIO.PUD_UP)         # pin input pullup
-GPIO.setup (encB1, GPIO.IN, pull_up_down=GPIO.PUD_UP)         # pin input pullup
-GPIO.add_event_detect (encA1, GPIO.FALLING, callback=do_encoder1)   # Encoder 1 interrupt
+GPIO.setup (encA1, GPIO.IN, pull_up_down=GPIO.PUD_UP)                 # pin input pullup
+GPIO.setup (encB1, GPIO.IN, pull_up_down=GPIO.PUD_UP)                 # pin input pullup
+GPIO.add_event_detect (encA1, GPIO.FALLING, callback=do_encoder1)     # Encoder 1 interrupt
 
 # Encoder 2 GPIO
-GPIO.setup (encA2, GPIO.IN, pull_up_down=GPIO.PUD_UP)         # pin input pullup
-GPIO.setup (encB2, GPIO.IN, pull_up_down=GPIO.PUD_UP)         # pin input pullup
-GPIO.add_event_detect (encA2, GPIO.FALLING, callback=do_encoder2)   # Encoder 2 interrupt
+GPIO.setup (encA2, GPIO.IN, pull_up_down=GPIO.PUD_UP)                 # pin input pullup
+GPIO.setup (encB2, GPIO.IN, pull_up_down=GPIO.PUD_UP)                 # pin input pullup
+GPIO.add_event_detect (encA2, GPIO.FALLING, callback=do_encoder2)     # Encoder 2 interrupt
 
 if __name__ == '__main__':
     try:

@@ -6,15 +6,21 @@ from std_msgs.msg import Byte
 import math
 import time
 
+"""
+    *** Velocity PID Control Node ***
+    This node is responsible for applying PID control
+    over the DC motors to reach certain set velocities
+"""
+
 goal_flag = 0 # 0:to continue motion - 1:to stop motion and reset variables
 
 # Global Variables for PID of right motor
-wr_actual = 0 # Actual Velocity
-wr_target = 0 # Target Velocity
-e_wr = 0 #Error in Velocity
-e_wr_prev = 0 #Derivative term
-e_wr_sum = 0 #Intergal Term
-action_r = 0 #Control action on right motor
+wr_actual = 0           # Actual Velocity
+wr_target = 0           # Target Velocity
+e_wr = 0                # Error in Velocity
+e_wr_prev = 0           # Derivative term
+e_wr_sum = 0            # Intergal Term
+action_r = 0            # Control action on right motor
 # PID Gains for right motor
 Kp_r = 0.42
 Ki_r = 0.15
@@ -32,7 +38,7 @@ Kp_l = 0.45
 Ki_l = 0.14
 Kd_l = 0.001
 
-#Defining the node and publishers
+# Defining the node and publishers
 rospy.init_node('vel_pid_rob1')
 r_pwr = rospy.Publisher('rmotor_pwr_rob1', Float32, queue_size = 5)
 l_pwr = rospy.Publisher('lmotor_pwr_rob1', Float32, queue_size = 5)
