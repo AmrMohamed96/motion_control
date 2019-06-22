@@ -1,6 +1,13 @@
 # Motion Control
 This ROS package contains simple yet mandatory scripts to move a differential mobile robot.
 
+## Motor Driver
+The motor driver script uses 6 wire, 2 PWM mode to drive two motors through an H-bridge. It subscribes to two power motor topics:
+```
+rmotor_pwr_rob1
+lmotor_pwr_rob1
+```
+
 ## Encoders
 The encoders script interfaces with quadrature encoders, calculates distances covered by each wheel and the velocities of each wheel
 
@@ -16,18 +23,13 @@ rwheel_spd_rob1
 lwheel_spd_rob1
 ```
 
-## Motor Driver
-The motor driver script uses 6 wire, 2 PWM mode to drive two motors through an H-bridge. It subscribes to two power motor topics:
-```
-rmotor_pwr_rob1
-lmotor_pwr_rob1
-```
 The topics need to have a value from -100,100 as a duty cycle for the motor. The script handles the negative input as a reversing direction
 
-## Diff_TF
-The odometry script subscribes to wheel velocities and distances, and then publishes the current position of the robot on:
+## Twist To Motors
+It then transforms the twist message into required wheel velocities by using the base width as **w** in the beginning of the script
+The script subscribes to a twist message on the following topic
 ```
-CurrentPosition_rob1
+cmd_vel_rob1
 ```
 
 ## Velocity PID
@@ -43,9 +45,8 @@ rwheel_spd_rob1
 lwheel_spd_rob1
 ```
 
-## Twist To Motors
-It then transforms the twist message into required wheel velocities by using the base width as **w** in the beginning of the script
-The script subscribes to a twist message on the following topic
+## Diff_TF
+The odometry script subscribes to wheel velocities and distances, and then publishes the current position of the robot on:
 ```
-cmd_vel_rob1
+CurrentPosition_rob1
 ```
