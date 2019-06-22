@@ -24,10 +24,10 @@ lmotor_pwr_rob1
 ```
 The topics need to have a value from -100,100 as a duty cycle for the motor. The script handles the negative input as a reversing direction
 
-## Odom
+## Diff_TF
 The odometry script subscribes to wheel velocities and distances, and then publishes the current position of the robot on:
 ```
-pose_rob1
+CurrentPosition_rob1
 ```
 
 ## Velocity PID
@@ -47,5 +47,5 @@ lwheel_spd_rob1
 It then transforms the twist message into required wheel velocities by using the base width as **w** in the beginning of the script
 The script subscribes to a twist message on the following topic
 ```
-cmd_vel
+cmd_vel_rob1
 ```
