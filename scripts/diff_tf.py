@@ -67,7 +67,7 @@ class DiffTf:
         rospy.Subscriber("enc1_ticks_rob1", Int32, self.rwheelCallback)
         rospy.Subscriber("enc2_ticks_rob1", Int32, self.lwheelCallback)
         self.odomPub = rospy.Publisher("odom", Odometry, queue_size=10)
-        self.odometryPub = rospy.Publisher("rob1_Position", Int32MultiArray, queue_size=10)
+        self.odometryPub = rospy.Publisher("CurrentPosition_rob1", Int32MultiArray, queue_size=10)
         self.odomBroadcaster = TransformBroadcaster()
 
     def spin(self):
@@ -142,7 +142,8 @@ class DiffTf:
             position = Int32MultiArray()
             x_cm = self.x * 100
             y_cm = self.y * 100
-            position.data = [x_cm, y_cm]
+            theta_rad = self.th * 100
+            position.data = [x_cm, y_cm, theta_rad]
             self.odometryPub.publish(position)
 
 

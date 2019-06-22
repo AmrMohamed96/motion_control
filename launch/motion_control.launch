@@ -1,4 +1,9 @@
 <launch>
+  <node pkg="motion_control" type="motor_driver.py" name="motor_driver_rob1">
+    <remap from="rmotor_pwr_rob1" to="rmotor_pwr_rob1" />
+    <remap from="lmotor_pwr_rob1" to="lmotor_pwr_rob1" />
+  </node>
+
   <node pkg="motion_control" type="encoders.py" name="encoders_rob1">
     <remap from="enc1_ticks_rob1" to="enc1_ticks_rob1"/>
     <remap from="enc1_ticks_rob1" to="enc2_ticks_rob1"/>
@@ -8,19 +13,11 @@
     <remap from="lwheel_dist_rob1" to="lwheel_dist_rob1"/>
   </node>
 
-  <node pkg="motion_control" type="diff_tf.py" name="odom_rob1">
-    <remap from="enc1_ticks_rob1" to="enc1_ticks_rob1"/>
-    <remap from="enc1_ticks_rob1" to="enc2_ticks_rob1"/>
-    <remap from="odom" to="odom_rob1"/>
-    <remap from="rob1_Position" to="rob1_Position"/>
+  <node pkg="motion_control" type="twist_to_motor.py" name="twister_rob1">
+    <remap from="cmd_vel_rob1" to="cmd_vel_rob1"/>
+    <remap from="rwheel_vtarget_rob1" to="rwheel_vtarget_rob1"/>
+    <remap from="lwheel_vtarget_rob1" to="lwheel_vtarget_rob1"/>
   </node>
-
-
-  <node pkg="motion_control" type="motor_driver.py" name="motor_driver_rob1">
-    <remap from="rmotor_pwr_rob1" to="rmotor_pwr_rob1" />
-    <remap from="lmotor_pwr_rob1" to="lmotor_pwr_rob1" />
-  </node>
-
 
   <node pkg="motion_control" type="vel_pid.py" name="vel_pid_rob1">
     <remap from="rmotor_pwr_rob1" to="rmotor_pwr_rob1"/>
@@ -32,9 +29,11 @@
     <remap from="gflag_rob1" to="gflag_rob1"/>
   </node>
 
-  <node pkg="motion_control" type="twist_to_motor.py" name="twister_rob1">
-    <remap from="cmd_vel" to="cmd_vel1"/>
-    <remap from="rwheel_vtarget_rob1" to="rwheel_vtarget_rob1"/>
-    <remap from="lwheel_vtarget_rob1" to="lwheel_vtarget_rob1"/>
+  <node pkg="motion_control" type="diff_tf.py" name="odom_rob1">
+    <remap from="enc1_ticks_rob1" to="enc1_ticks_rob1"/>
+    <remap from="enc1_ticks_rob1" to="enc2_ticks_rob1"/>
+    <remap from="odom" to="odom_rob1"/>
+    <remap from="CurrentPosition_rob1" to="CurrentPosition_rob1"/>
   </node>
+
 </launch>

@@ -43,7 +43,7 @@ def twister():
     rospy.loginfo("%s started" % rospy.get_name())
 
     # Subscriber to the Twist Message
-    rospy.Subscriber('cmd_vel', Twist, twistCallback)
+    rospy.Subscriber('cmd_vel_rob1', Twist, twistCallback)
 
     pub_rmotor = rospy.Publisher('rwheel_vtarget_rob1', Float32, queue_size=20)
     pub_lmotor = rospy.Publisher('lwheel_vtarget_rob1', Float32, queue_size=20)
