@@ -6,7 +6,7 @@
 
   <node pkg="motion_control" type="encoders.py" name="encoders_rob1">
     <remap from="enc1_ticks_rob1" to="enc1_ticks_rob1"/>
-    <remap from="enc1_ticks_rob1" to="enc2_ticks_rob1"/>
+    <remap from="enc2_ticks_rob1" to="enc2_ticks_rob1"/>
     <remap from="rwheel_spd_rob1" to="rwheel_spd_rob1"/>
     <remap from="lwheel_spd_rob1" to="lwheel_spd_rob1"/>
     <remap from="rwheel_dist_rob1" to="rwheel_dist_rob1"/>
@@ -31,7 +31,7 @@
 
   <node pkg="motion_control" type="diff_tf.py" name="odom_rob1">
     <remap from="enc1_ticks_rob1" to="enc1_ticks_rob1"/>
-    <remap from="enc1_ticks_rob1" to="enc2_ticks_rob1"/>
+    <remap from="enc2_ticks_rob1" to="enc2_ticks_rob1"/>
     <remap from="odom" to="odom_rob1"/>
     <remap from="CurrentPosition_rob1" to="CurrentPosition_rob1"/>
   </node>
