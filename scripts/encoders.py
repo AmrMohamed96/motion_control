@@ -25,16 +25,16 @@ GPIO.setwarnings(False)
 
 """ Encoders Pins and Counter Variables """
 # Right Motor
-encA1 = 23
-encB1 = 22
+encA1 = 23 #22
+encB1 = 22 #27
 encoder1_ticks = 0
 encoder1_ticks_calc = 0
 encoder1_ticks_prev = 0
 r_ticks = 0
 
 # Left Motor
-encA2 = 27
-encB2 = 24
+encA2 = 27 #11
+encB2 = 24 #9
 encoder2_ticks = 0
 encoder2_ticks_calc = 0
 encoder2_ticks_prev = 0
